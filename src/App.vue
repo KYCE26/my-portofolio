@@ -9,7 +9,7 @@ import Footer from './components/Footer.vue'; // <-- Pastikan ini di-import
 </script>
 
 <template>
-  <div class="bg-brand-bg text-brand-text">
+  <div class="bg-brand-bg text-brand-text" overflow-hidden>
     <Navbar />
     <main>
       <Hero />
