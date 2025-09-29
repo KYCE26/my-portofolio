@@ -22,7 +22,7 @@ export const certificates = [
     id: 4, 
     title: 'Sertifikat Oracle Final Exam java Programming', 
     image: '/images/certs/FinalExamJavaProgramming.PNG',
-    pdfUrl: '/pdfs/clmsCertificate(1).pdf'
+    pdfUrl: '/pdfs/clmsCertificate (1).pdf'
   },
   { 
     id: 5, 
@@ -35,5 +35,11 @@ export const certificates = [
     title: 'Sertifikat SFPC - Scrum Foundation Professional Certification', 
     image: '/images/certs/SFPC.PNG',
     pdfUrl: '/pdfs/sertifikat-oracle-b.pdf'
+  },
+  { 
+    id: 7, 
+    title: 'Sertifikat Belajar Dasar AI', 
+    image: '/images/certs/Dicoding_Dasar_AI.PNG',
+    pdfUrl: '/pdfs/sertifikat_course_653_3226203_290925163213.pdf'
   },
 ];
