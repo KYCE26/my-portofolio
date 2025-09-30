@@ -5,11 +5,11 @@ import Hero from './components/Hero.vue';
 import Projects from './components/Projects.vue';
 import Publications from './components/Publications.vue';
 import Certifications from './components/Certifications.vue';
-import Footer from './components/Footer.vue'; // <-- Pastikan ini di-import
+import Footer from './components/Footer.vue';
 </script>
 
 <template>
-  <div class="bg-brand-bg text-brand-text" overflow-hidden>
+  <div class="bg-brand-bg text-brand-text"> 
     <Navbar />
     <main>
       <Hero />
@@ -17,5 +17,6 @@ import Footer from './components/Footer.vue'; // <-- Pastikan ini di-import
       <Publications />
       <Certifications />
     </main>
-    <Footer /> </div>
+    <Footer />
+  </div>
 </template>
