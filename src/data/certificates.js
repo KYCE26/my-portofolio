@@ -42,4 +42,10 @@ export const certificates = [
     image: '/images/certs/Dicoding_Dasar_AI.PNG',
     pdfUrl: '/pdfs/sertifikat_course_653_3226203_290925163213.pdf'
   },
+    { 
+    id: 8, 
+    title: 'Sertifikat Belajar Dasar Pemrograman Web', 
+    image: '/images/certs/Dicoding_Dasar_Pemrograman_Web.PNG',
+    pdfUrl: '/pdfs/sertifikat_course_123_3226203_161125203717.pdf'
+  },
 ];
