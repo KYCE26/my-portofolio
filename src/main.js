@@ -5,13 +5,14 @@ import App from './App.vue'
 import './style.css'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
+import router from './router'
 import VueKinesis from 'vue-kinesis'
 
 // --- 1. Impor v-wave ---
 import VWave from 'v-wave'
 
 const app = createApp(App)
-
+app.use(router);
 app.use(VueKinesis)
 
 // --- 2. Daftarkan v-wave dengan konfigurasi warna tema kita ---
