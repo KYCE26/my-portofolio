@@ -40,7 +40,7 @@ const props = defineProps<{
         <div 
           v-for="(project, index) in data" 
           :key="project.id"
-          class="group relative bg-zinc-900/40 backdrop-blur-sm border border-white/5 rounded-2xl overflow-hidden hover:border-brand-primary/50 transition-all duration-500 hover:shadow-2xl hover:shadow-brand-primary/10 hover:-translate-y-2 flex flex-col h-full will-change-transform"
+          class="group relative bg-zinc-900/40 backdrop-blur-sm border border-white/5 rounded-2xl overflow-hidden hover:border-brand-primary/50 transition-all duration-300 hover:shadow-2xl hover:shadow-brand-primary/10 hover:-translate-y-2 flex flex-col h-full will-change-transform"
           data-aos="fade-up"
           :data-aos-delay="index * 100"
         >
@@ -52,27 +52,29 @@ const props = defineProps<{
             </div>
             <div class="ml-4 h-5 rounded bg-black/20 w-2/3 flex items-center px-2">
               <span class="text-[9px] text-zinc-500 font-mono truncate opacity-70">
-                https://github.com/{{ project.title.toLowerCase().replace(/ /g, '-') }}
+                repo/{{ project.title.toLowerCase().replace(/ /g, '-') }}
               </span>
             </div>
           </div>
 
-          <div class="aspect-video w-full overflow-hidden relative bg-zinc-950">
-            <div class="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent z-10 opacity-30 group-hover:opacity-0 transition-opacity duration-500"></div>
+          <div class="aspect-video w-full overflow-hidden relative bg-zinc-950 border-b border-white/5">
+            
+            <div class="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent z-10 opacity-30 group-hover:opacity-0 transition-opacity duration-500 pointer-events-none"></div>
             
             <img 
               v-if="project.image_url" 
               :src="project.image_url" 
               :alt="project.title" 
               loading="lazy"
-              class="w-full h-full object-cover object-top transform group-hover:scale-105 transition-transform duration-700 ease-out"
+              class="w-full h-full object-cover object-top transition-[object-position] duration-[3000ms] ease-in-out group-hover:object-bottom"
             >
+            
             <div v-else class="w-full h-full flex flex-col items-center justify-center text-zinc-600 bg-zinc-900">
               <span class="text-[10px] uppercase tracking-widest opacity-50 font-bold">Preview Unavailable</span>
             </div>
           </div>
 
-          <div class="p-6 flex flex-col flex-grow relative z-20 border-t border-white/5">
+          <div class="p-6 flex flex-col flex-grow relative z-20 bg-zinc-900/20">
             <div class="mb-4">
               <h3 class="text-xl font-bold text-white mb-2 group-hover:text-brand-primary transition-colors duration-300 line-clamp-1">
                 {{ project.title }}
@@ -150,7 +152,7 @@ const props = defineProps<{
                  <p class="text-sm text-amber-400/80 italic font-medium">
                     ✨ Tertarik melihat demo karya terbaik saya?
                  </p>
-                 <a href="#footer" v-wave class="px-6 py-3 rounded-full bg-white text-black font-bold hover:bg-zinc-200 transition-colors shadow-lg shadow-white/10 flex items-center gap-2 group/btn">
+                 <a href="#kontak" v-wave class="px-6 py-3 rounded-full bg-white text-black font-bold hover:bg-zinc-200 transition-colors shadow-lg shadow-white/10 flex items-center gap-2 group/btn">
                     Hubungi Saya
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover/btn:translate-x-1 transition-transform"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                  </a>
@@ -176,7 +178,7 @@ const props = defineProps<{
   animation: gradient-shift 5s ease infinite;
 }
 
-/* Optimasi Performa */
+/* Memastikan GPU Hardware Acceleration aktif untuk scroll mulus */
 .will-change-transform {
   will-change: transform;
 }
