@@ -12,8 +12,8 @@ const isMobileMenuOpen = ref(false);
 const navLinks = [
   { href: '#home', label: 'Home' },
   { href: '#proyek', label: 'Proyek' },
-  { href: '#publikasi', label: 'Publikasi' },
-  { href: '#sertifikasi', label: 'Sertifikasi' },
+  { href: '#tulisan', label: 'Publikasi' },
+  { href: '#sertifikat', label: 'Sertifikasi' },
 ];
 
 // Fungsi untuk menangani event scroll
