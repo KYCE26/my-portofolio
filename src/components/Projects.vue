@@ -1,9 +1,78 @@
 <script setup lang="ts">
-import { defineProps } from 'vue';
+import { defineProps, ref, onMounted } from 'vue';
 
 const props = defineProps<{
   data: any[]
 }>();
+
+const prefersReducedMotion = ref(false);
+
+/* ------------------------------------------------------------------ */
+/* Tilt 3D kartu proyek mengikuti posisi kursor                        */
+/* ------------------------------------------------------------------ */
+function onCardMove(e: MouseEvent) {
+  if (prefersReducedMotion.value) return;
+  const el = e.currentTarget as HTMLElement;
+  const rect = el.getBoundingClientRect();
+  const px = (e.clientX - rect.left) / rect.width - 0.5;
+  const py = (e.clientY - rect.top) / rect.height - 0.5;
+  el.style.transform = `perspective(1000px) rotateX(${(-py * 6).toFixed(2)}deg) rotateY(${(px * 6).toFixed(2)}deg) translateY(-8px)`;
+}
+function onCardLeave(e: MouseEvent) {
+  (e.currentTarget as HTMLElement).style.transform = '';
+}
+
+/* ------------------------------------------------------------------ */
+/* Magnetic hover untuk tombol Code / Live Demo / Hubungi Saya          */
+/* ------------------------------------------------------------------ */
+function magnetize(e: MouseEvent) {
+  if (prefersReducedMotion.value) return;
+  const el = e.currentTarget as HTMLElement;
+  const rect = el.getBoundingClientRect();
+  const x = (e.clientX - rect.left - rect.width / 2) * 0.3;
+  const y = (e.clientY - rect.top - rect.height / 2) * 0.3;
+  el.style.transform = `translate(${x}px, ${y}px)`;
+}
+function resetMagnet(e: MouseEvent) {
+  (e.currentTarget as HTMLElement).style.transform = '';
+}
+
+/* ------------------------------------------------------------------ */
+/* Partikel kecil saat tombol diklik                                    */
+/* ------------------------------------------------------------------ */
+interface Particle { id: number; owner: string; x: number; y: number; tx: number; ty: number; color: string }
+const particles = ref<Particle[]>([]);
+let particleId = 0;
+
+function burst(e: MouseEvent, owner: string, color: string) {
+  if (prefersReducedMotion.value) return;
+  const el = e.currentTarget as HTMLElement;
+  const rect = el.getBoundingClientRect();
+  const originX = e.clientX - rect.left;
+  const originY = e.clientY - rect.top;
+  const count = 7;
+  for (let i = 0; i < count; i++) {
+    const angle = (Math.PI * 2 * i) / count + Math.random() * 0.4;
+    const dist = 30 + Math.random() * 24;
+    const id = particleId++;
+    particles.value.push({
+      id,
+      owner,
+      x: originX,
+      y: originY,
+      tx: Math.cos(angle) * dist,
+      ty: Math.sin(angle) * dist,
+      color,
+    });
+    setTimeout(() => {
+      particles.value = particles.value.filter((p) => p.id !== id);
+    }, 600);
+  }
+}
+
+onMounted(() => {
+  prefersReducedMotion.value = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+});
 </script>
 
 <template>
@@ -40,9 +109,11 @@ const props = defineProps<{
         <div 
           v-for="(project, index) in data" 
           :key="project.id"
-          class="group relative bg-zinc-900/40 backdrop-blur-sm border border-white/5 rounded-2xl overflow-hidden hover:border-brand-primary/50 transition-all duration-300 hover:shadow-2xl hover:shadow-brand-primary/10 hover:-translate-y-2 flex flex-col h-full will-change-transform"
+          class="tilt-card group relative bg-zinc-900/40 backdrop-blur-sm border border-white/5 rounded-2xl overflow-hidden hover:border-brand-primary/50 transition-all duration-300 hover:shadow-2xl hover:shadow-brand-primary/10 flex flex-col h-full will-change-transform"
           data-aos="fade-up"
           :data-aos-delay="index * 100"
+          @mousemove="onCardMove"
+          @mouseleave="onCardLeave"
         >
           <div class="h-9 bg-zinc-800/80 border-b border-white/5 flex items-center px-4 gap-2 backdrop-blur-md z-20">
             <div class="flex gap-1.5">
@@ -99,8 +170,17 @@ const props = defineProps<{
                 v-if="project.repo_url" 
                 :href="project.repo_url" 
                 target="_blank" 
-                class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-zinc-800/50 hover:bg-white/10 text-sm text-zinc-300 transition-colors group/btn border border-white/5"
+                class="magnetic-btn relative overflow-hidden flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-zinc-800/50 hover:bg-white/10 text-sm text-zinc-300 transition-colors group/btn border border-white/5"
+                @mousemove="magnetize"
+                @mouseleave="resetMagnet"
+                @click="burst($event, `${project.id}-code`, '#ffffff')"
               >
+                <span
+                  v-for="p in particles.filter(p => p.owner === `${project.id}-code`)"
+                  :key="p.id"
+                  class="particle"
+                  :style="{ left: p.x + 'px', top: p.y + 'px', '--tx': p.tx + 'px', '--ty': p.ty + 'px', background: p.color }"
+                ></span>
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover/btn:scale-110 transition-transform"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
                 Code
               </a>
@@ -108,8 +188,17 @@ const props = defineProps<{
                 v-if="project.demo_url" 
                 :href="project.demo_url" 
                 target="_blank" 
-                class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-brand-primary hover:bg-brand-primary-light text-sm text-white font-bold transition-all duration-300 shadow-lg shadow-brand-primary/20 hover:shadow-brand-primary/40 group/btn"
+                class="magnetic-btn relative overflow-hidden flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-brand-primary hover:bg-brand-primary-light text-sm text-white font-bold transition-all duration-300 shadow-lg shadow-brand-primary/20 hover:shadow-brand-primary/40 group/btn"
+                @mousemove="magnetize"
+                @mouseleave="resetMagnet"
+                @click="burst($event, `${project.id}-demo`, '#ffffff')"
               >
+                <span
+                  v-for="p in particles.filter(p => p.owner === `${project.id}-demo`)"
+                  :key="p.id"
+                  class="particle"
+                  :style="{ left: p.x + 'px', top: p.y + 'px', '--tx': p.tx + 'px', '--ty': p.ty + 'px', background: p.color }"
+                ></span>
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover/btn:translate-x-1 transition-transform"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                 Live Demo
               </a>
@@ -152,7 +241,20 @@ const props = defineProps<{
                  <p class="text-sm text-amber-400/80 italic font-medium">
                     ✨ Tertarik melihat demo karya terbaik saya?
                  </p>
-                 <a href="#kontak" v-wave class="px-6 py-3 rounded-full bg-white text-black font-bold hover:bg-zinc-200 transition-colors shadow-lg shadow-white/10 flex items-center gap-2 group/btn">
+                 <a
+                   href="#kontak"
+                   v-wave
+                   class="magnetic-btn relative overflow-hidden px-6 py-3 rounded-full bg-white text-black font-bold hover:bg-zinc-200 transition-colors shadow-lg shadow-white/10 flex items-center gap-2 group/btn"
+                   @mousemove="magnetize"
+                   @mouseleave="resetMagnet"
+                   @click="burst($event, 'enterprise-cta', 'var(--tw-color-brand-primary, #a855f7)')"
+                 >
+                    <span
+                      v-for="p in particles.filter(p => p.owner === 'enterprise-cta')"
+                      :key="p.id"
+                      class="particle"
+                      :style="{ left: p.x + 'px', top: p.y + 'px', '--tx': p.tx + 'px', '--ty': p.ty + 'px', background: p.color }"
+                    ></span>
                     Hubungi Saya
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover/btn:translate-x-1 transition-transform"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                  </a>
@@ -181,5 +283,46 @@ const props = defineProps<{
 /* Memastikan GPU Hardware Acceleration aktif untuk scroll mulus */
 .will-change-transform {
   will-change: transform;
+}
+
+/* Tilt 3D kartu proyek: transform diatur lewat JS, di sini cukup transisinya */
+.tilt-card {
+  transition: transform 0.2s ease-out, border-color 0.3s, box-shadow 0.3s;
+  transform-style: preserve-3d;
+}
+
+/* Tombol dengan efek magnetic mengikuti kursor */
+.magnetic-btn {
+  transition: transform 0.2s ease-out, background-color 0.3s, box-shadow 0.3s;
+}
+
+.particle {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 9999px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  animation: project-particle-burst 0.55s ease-out forwards;
+}
+@keyframes project-particle-burst {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) translate(0, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translate(var(--tx), var(--ty)) scale(0.3);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tilt-card,
+  .magnetic-btn {
+    transition: none;
+  }
+  .particle {
+    display: none;
+  }
 }
 </style>

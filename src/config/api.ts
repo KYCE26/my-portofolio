@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// Ganti URL ini dengan URL Railway kamu yang asli
-const API_URL = 'https://rifky-portfolio-api-production.up.railway.app/api';
+// Ganti URL Railway jadi path relatif (slash api)
+const API_URL = '/api';
 
 export const api = axios.create({
   baseURL: API_URL,
@@ -10,5 +10,5 @@ export const api = axios.create({
   }
 });
 
-// Helper biar gampang panggil endpoint gambar
+// Helper biar gampang panggil endpoint gambar (Supabase biarin aja, ini udah bener)
 export const STORAGE_URL = 'https://qiouupklvkgrlxlkevns.supabase.co/storage/v1/object/public/portfolio-assets';

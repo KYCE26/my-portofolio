@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps } from 'vue';
+import { defineProps, ref } from 'vue';
 
 const props = defineProps<{
   data: any[]
@@ -11,6 +11,35 @@ const formatDate = (dateString: string) => {
   const date = new Date(dateString);
   return new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).format(date);
 };
+
+const prefersReducedMotion = ref(false);
+if (typeof window !== 'undefined') {
+  prefersReducedMotion.value = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+/* ------------------------------------------------------------------ */
+/* Micro-parallax: ikon kiri mendekat ke kursor, panah kanan menjauh    */
+/* ------------------------------------------------------------------ */
+function onRowMove(e: MouseEvent) {
+  if (prefersReducedMotion.value) return;
+  const el = e.currentTarget as HTMLElement;
+  const rect = el.getBoundingClientRect();
+  const px = (e.clientX - rect.left) / rect.width - 0.5;
+  const py = (e.clientY - rect.top) / rect.height - 0.5;
+
+  const icon = el.querySelector('.pub-icon') as HTMLElement | null;
+  const arrow = el.querySelector('.pub-arrow') as HTMLElement | null;
+
+  if (icon) icon.style.transform = `translate(${px * 8}px, ${py * 8}px)`;
+  if (arrow) arrow.style.transform = `translate(${px * -12}px, ${py * -12}px)`;
+}
+function onRowLeave(e: MouseEvent) {
+  const el = e.currentTarget as HTMLElement;
+  const icon = el.querySelector('.pub-icon') as HTMLElement | null;
+  const arrow = el.querySelector('.pub-arrow') as HTMLElement | null;
+  if (icon) icon.style.transform = '';
+  if (arrow) arrow.style.transform = '';
+}
 </script>
 
 <template>
@@ -36,15 +65,20 @@ const formatDate = (dateString: string) => {
         <div 
           v-for="(pub, index) in data" 
           :key="pub.id"
-          class="group relative p-[1px] rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1"
+          class="pub-row group relative p-[1px] rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1"
           data-aos="fade-up"
           :data-aos-delay="index * 100"
+          @mousemove="onRowMove"
+          @mouseleave="onRowLeave"
         >
           <div class="absolute inset-0 bg-gradient-to-r from-white/5 via-white/10 to-white/5 group-hover:from-cyan-500/50 group-hover:via-brand-primary/50 group-hover:to-cyan-500/50 transition-all duration-500 opacity-50 group-hover:opacity-100"></div>
+
+          <!-- Shimmer tipis yang berputar mengelilingi border saat di-hover -->
+          <div class="border-shimmer absolute inset-0 pointer-events-none"></div>
           
           <div class="relative bg-zinc-900/90 backdrop-blur-xl rounded-2xl p-6 md:p-8 flex flex-col md:flex-row gap-6 items-start h-full">
             
-            <div class="shrink-0 w-14 h-14 rounded-xl flex items-center justify-center bg-zinc-800 border border-zinc-700 group-hover:border-cyan-500/30 group-hover:bg-cyan-500/10 transition-colors">
+            <div class="pub-icon shrink-0 w-14 h-14 rounded-xl flex items-center justify-center bg-zinc-800 border border-zinc-700 group-hover:border-cyan-500/30 group-hover:bg-cyan-500/10 transition-colors">
               <svg v-if="pub.type === 'Buku'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400 group-hover:text-cyan-400 transition-colors"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
               <svg v-else xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400 group-hover:text-brand-primary transition-colors"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
             </div>
@@ -82,7 +116,7 @@ const formatDate = (dateString: string) => {
               </a>
             </div>
 
-            <div class="hidden md:flex shrink-0 self-center opacity-0 group-hover:opacity-100 transition-opacity -translate-x-4 group-hover:translate-x-0 duration-300 text-zinc-500">
+            <div class="pub-arrow hidden md:flex shrink-0 self-center opacity-0 group-hover:opacity-100 transition-opacity -translate-x-4 group-hover:translate-x-0 duration-300 text-zinc-500">
                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
             </div>
 
@@ -101,3 +135,37 @@ const formatDate = (dateString: string) => {
     </div>
   </section>
 </template>
+
+<style scoped>
+/* Ikon & panah bergerak halus saat mouse digerakkan di atas baris (micro-parallax) */
+.pub-icon,
+.pub-arrow {
+  transition: transform 0.15s ease-out;
+}
+
+/* Shimmer berputar mengelilingi border kartu saat di-hover */
+.border-shimmer {
+  border-radius: inherit;
+  opacity: 0;
+  background: conic-gradient(from 0deg, transparent 0%, rgba(34, 211, 238, 0.55) 12%, transparent 24%);
+  transition: opacity 0.4s ease;
+}
+.group:hover .border-shimmer {
+  opacity: 1;
+  animation: shimmer-spin 2.8s linear infinite;
+}
+
+@keyframes shimmer-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pub-icon,
+  .pub-arrow {
+    transition: none;
+  }
+  .border-shimmer {
+    display: none;
+  }
+}
+</style>

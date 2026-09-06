@@ -1,43 +1,159 @@
 <script setup lang="ts">
+import { ref, onMounted, onUnmounted, nextTick } from 'vue';
+
 // Data Kontak dengan warna brand spesifik untuk efek hover
 const contacts = [
   {
     name: 'Email',
     url: 'mailto:muhammad26rifky06@gmail.com',
     icon: '<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline>',
-    color: 'hover:text-red-500 hover:border-red-500/50 hover:bg-red-500/10 hover:shadow-red-500/20'
+    color: 'hover:text-red-500 hover:border-red-500/50 hover:bg-red-500/10 hover:shadow-red-500/20',
+    particle: '#ef4444',
+    copyValue: 'muhammad26rifky06@gmail.com'
   },
   {
     name: 'LinkedIn',
     url: 'https://www.linkedin.com/in/muhammad-rifky-71381a193/',
     icon: '<path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle>',
-    color: 'hover:text-blue-500 hover:border-blue-500/50 hover:bg-blue-500/10 hover:shadow-blue-500/20'
+    color: 'hover:text-blue-500 hover:border-blue-500/50 hover:bg-blue-500/10 hover:shadow-blue-500/20',
+    particle: '#3b82f6'
   },
   {
     name: 'GitHub',
     url: 'https://github.com/KYCE26',
     icon: '<path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.54 2.73c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>',
-    color: 'hover:text-white hover:border-white/50 hover:bg-white/10 hover:shadow-white/20'
+    color: 'hover:text-white hover:border-white/50 hover:bg-white/10 hover:shadow-white/20',
+    particle: '#ffffff'
   },
   {
     name: 'Instagram',
     url: 'https://www.instagram.com/26Rifky',
     icon: '<rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>',
-    color: 'hover:text-pink-500 hover:border-pink-500/50 hover:bg-pink-500/10 hover:shadow-pink-500/20'
+    color: 'hover:text-pink-500 hover:border-pink-500/50 hover:bg-pink-500/10 hover:shadow-pink-500/20',
+    particle: '#ec4899'
   },
   {
     name: 'WhatsApp',
     url: 'https://wa.me/62895636553207',
     icon: '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>',
-    color: 'hover:text-green-500 hover:border-green-500/50 hover:bg-green-500/10 hover:shadow-green-500/20'
+    color: 'hover:text-green-500 hover:border-green-500/50 hover:bg-green-500/10 hover:shadow-green-500/20',
+    particle: '#22c55e'
   },
   {
     name: 'Telegram',
     url: 'https://t.me/62895636553207',
     icon: '<path d="M21.198 2.433a2.242 2.242 0 0 0-1.022.215l-18.6 9.2a2.245 2.245 0 0 0-.58 4.03l5.1 2.55L18.3 6.2 8.7 16.1l4.8 2.4a2.245 2.245 0 0 0 3.16-.9l4.8-13.8a2.242 2.242 0 0 0-.262-1.367Z"/>',
-    color: 'hover:text-sky-400 hover:border-sky-400/50 hover:bg-sky-400/10 hover:shadow-sky-400/20'
+    color: 'hover:text-sky-400 hover:border-sky-400/50 hover:bg-sky-400/10 hover:shadow-sky-400/20',
+    particle: '#38bdf8'
   }
 ];
+
+const prefersReducedMotion = ref(false);
+
+/* ------------------------------------------------------------------ */
+/* Reveal ikon sosial satu-satu saat footer masuk viewport             */
+/* ------------------------------------------------------------------ */
+const iconsRow = ref<HTMLElement | null>(null);
+const iconsVisible = ref(false);
+let footerObserver: IntersectionObserver | null = null;
+
+/* ------------------------------------------------------------------ */
+/* Magnetic hover pada tiap ikon sosial                                 */
+/* ------------------------------------------------------------------ */
+function magnetize(e: MouseEvent) {
+  if (prefersReducedMotion.value) return;
+  const el = e.currentTarget as HTMLElement;
+  const rect = el.getBoundingClientRect();
+  const x = (e.clientX - rect.left - rect.width / 2) * 0.4;
+  const y = (e.clientY - rect.top - rect.height / 2) * 0.4;
+  el.style.transform = `translate(${x}px, ${y}px)`;
+}
+function resetMagnet(e: MouseEvent) {
+  (e.currentTarget as HTMLElement).style.transform = '';
+}
+
+/* ------------------------------------------------------------------ */
+/* Partikel burst warna sesuai brand tiap platform saat diklik         */
+/* ------------------------------------------------------------------ */
+interface Particle { id: number; owner: string; x: number; y: number; tx: number; ty: number; color: string }
+const particles = ref<Particle[]>([]);
+let particleId = 0;
+
+function burst(e: MouseEvent, name: string, color: string) {
+  if (prefersReducedMotion.value) return;
+  const el = e.currentTarget as HTMLElement;
+  const rect = el.getBoundingClientRect();
+  const originX = e.clientX - rect.left;
+  const originY = e.clientY - rect.top;
+  const count = 8;
+  for (let i = 0; i < count; i++) {
+    const angle = (Math.PI * 2 * i) / count + Math.random() * 0.4;
+    const dist = 28 + Math.random() * 22;
+    const id = particleId++;
+    particles.value.push({
+      id,
+      owner: name,
+      x: originX,
+      y: originY,
+      tx: Math.cos(angle) * dist,
+      ty: Math.sin(angle) * dist,
+      color,
+    });
+    setTimeout(() => {
+      particles.value = particles.value.filter((p) => p.id !== id);
+    }, 600);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Salin email ke clipboard + toast kecil                              */
+/* ------------------------------------------------------------------ */
+const toastVisible = ref(false);
+let toastTimeout: ReturnType<typeof setTimeout> | null = null;
+
+async function handleContactClick(e: MouseEvent, contact: typeof contacts[number]) {
+  burst(e, contact.name, contact.particle);
+  if (contact.copyValue && navigator.clipboard) {
+    try {
+      await navigator.clipboard.writeText(contact.copyValue);
+      toastVisible.value = true;
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => { toastVisible.value = false; }, 2000);
+    } catch {
+      // Kalau clipboard API gagal (misal permission), biarkan mailto tetap jalan seperti biasa
+    }
+  }
+}
+
+onMounted(() => {
+  prefersReducedMotion.value = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (prefersReducedMotion.value) {
+    iconsVisible.value = true;
+    return;
+  }
+
+  footerObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          iconsVisible.value = true;
+          footerObserver?.disconnect();
+        }
+      });
+    },
+    { threshold: 0.2 }
+  );
+
+  nextTick(() => {
+    if (iconsRow.value) footerObserver?.observe(iconsRow.value);
+  });
+});
+
+onUnmounted(() => {
+  footerObserver?.disconnect();
+  if (toastTimeout) clearTimeout(toastTimeout);
+});
 </script>
 
 <template>
@@ -62,16 +178,30 @@ const contacts = [
         </p>
       </div>
 
-      <div data-aos="fade-up" data-aos-delay="100" class="flex flex-wrap justify-center items-center gap-6 mb-20">
+      <div ref="iconsRow" data-aos="fade-up" data-aos-delay="100" class="flex flex-wrap justify-center items-center gap-6 mb-20">
         <a 
-          v-for="contact in contacts"
+          v-for="(contact, index) in contacts"
           :key="contact.name"
           :href="contact.url" 
           target="_blank" 
-          :class="`group relative p-4 rounded-full transition-all duration-300 border border-zinc-800 bg-zinc-900/50 text-zinc-400 hover:-translate-y-2 hover:shadow-lg ${contact.color}`"
+          :class="[
+            'social-icon group relative p-4 rounded-full transition-colors duration-300 border border-zinc-800 bg-zinc-900/50 text-zinc-400 hover:shadow-lg',
+            contact.color,
+            iconsVisible ? 'social-icon--visible' : ''
+          ]"
+          :style="{ transitionDelay: iconsVisible ? (index * 0.06) + 's' : '0s' }"
           :aria-label="contact.name"
           :title="contact.name"
+          @mousemove="magnetize"
+          @mouseleave="resetMagnet"
+          @click="handleContactClick($event, contact)"
         >
+          <span
+            v-for="p in particles.filter(p => p.owner === contact.name)"
+            :key="p.id"
+            class="particle"
+            :style="{ left: p.x + 'px', top: p.y + 'px', '--tx': p.tx + 'px', '--ty': p.ty + 'px', background: p.color }"
+          ></span>
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-colors" v-html="contact.icon">
           </svg>
         </a>
@@ -87,16 +217,26 @@ const contacts = [
         <div class="flex items-center gap-3 bg-zinc-900/80 py-2 px-5 rounded-full border border-white/5 hover:border-brand-primary/30 transition-colors group">
           <span class="text-xs font-mono text-zinc-500 group-hover:text-zinc-300 transition-colors">Built with</span>
           <div class="flex items-center gap-3 grayscale group-hover:grayscale-0 transition-all duration-500">
-             <img src="https://skillicons.dev/icons?i=vue" alt="Vue" class="w-4 h-4" />
-             <img src="https://skillicons.dev/icons?i=vite" alt="Vite" class="w-4 h-4" />
-             <img src="https://skillicons.dev/icons?i=ts" alt="TS" class="w-4 h-4" />
-             <img src="https://skillicons.dev/icons?i=fastapi" alt="FastAPI" class="w-4 h-4" />
+             <img src="https://skillicons.dev/icons?i=vue" alt="Vue" class="w-4 h-4 tech-icon" />
+             <img src="https://skillicons.dev/icons?i=vite" alt="Vite" class="w-4 h-4 tech-icon" />
+             <img src="https://skillicons.dev/icons?i=ts" alt="TS" class="w-4 h-4 tech-icon" />
+             <img src="https://skillicons.dev/icons?i=fastapi" alt="FastAPI" class="w-4 h-4 tech-icon" />
           </div>
         </div>
 
       </div>
 
     </div>
+
+    <!-- Toast kecil saat email berhasil disalin -->
+    <Transition name="toast">
+      <div
+        v-if="toastVisible"
+        class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-zinc-900 border border-brand-primary/40 text-zinc-200 text-sm px-4 py-2 rounded-full shadow-lg shadow-brand-primary/10"
+      >
+        Email disalin ke clipboard
+      </div>
+    </Transition>
   </footer>
 </template>
 
@@ -110,5 +250,72 @@ const contacts = [
 .animate-gradient {
   background-size: 200% auto;
   animation: gradient-shift 5s ease infinite;
+}
+
+/* Ikon sosial: reveal bertahap saat footer masuk viewport */
+.social-icon {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease, background-color 0.3s, border-color 0.3s, color 0.3s, box-shadow 0.3s;
+}
+.social-icon--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* Transform magnetic (translate saat mousemove) di-set lewat inline style JS,
+   jadi transisinya perlu tetap halus meski di atas transform reveal */
+.social-icon:hover {
+  transition-duration: 0.15s, 0.15s, 0.3s, 0.3s, 0.3s, 0.3s;
+}
+
+.particle {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 9999px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  animation: footer-particle-burst 0.55s ease-out forwards;
+}
+@keyframes footer-particle-burst {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) translate(0, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translate(var(--tx), var(--ty)) scale(0.3);
+  }
+}
+
+.tech-icon {
+  transition: transform 0.2s ease;
+}
+.tech-icon:hover {
+  transform: translateY(-3px) scale(1.15);
+}
+
+.toast-enter-active,
+.toast-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.toast-enter-from,
+.toast-leave-to {
+  opacity: 0;
+  transform: translate(-50%, 10px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .social-icon {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .particle {
+    display: none;
+  }
+  .tech-icon {
+    transition: none;
+  }
 }
 </style>

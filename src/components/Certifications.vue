@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, ref } from 'vue';
+import { defineProps, ref, onMounted } from 'vue';
 import PdfModal from './PdfModal.vue'; // 1. Import Modal
 
 const props = defineProps<{
@@ -11,12 +11,70 @@ const showModal = ref(false);
 const activePdf = ref('');
 const activeTitle = ref('');
 
+const prefersReducedMotion = ref(false);
+
 // 3. Fungsi Buka Modal
 const openCertificate = (url: string, title: string) => {
   activePdf.value = url;
   activeTitle.value = title;
   showModal.value = true;
 };
+
+/* ------------------------------------------------------------------ */
+/* Tilt 3D per kartu mengikuti posisi kursor                           */
+/* ------------------------------------------------------------------ */
+function onCardMove(e: MouseEvent) {
+  if (prefersReducedMotion.value) return;
+  const el = e.currentTarget as HTMLElement;
+  const rect = el.getBoundingClientRect();
+  const px = (e.clientX - rect.left) / rect.width - 0.5;
+  const py = (e.clientY - rect.top) / rect.height - 0.5;
+  el.style.transform = `perspective(900px) rotateX(${(-py * 8).toFixed(2)}deg) rotateY(${(px * 8).toFixed(2)}deg) translateY(-6px)`;
+}
+function onCardLeave(e: MouseEvent) {
+  (e.currentTarget as HTMLElement).style.transform = '';
+}
+
+/* ------------------------------------------------------------------ */
+/* Partikel kecil saat tombol "Lihat Sertifikat" diklik                */
+/* ------------------------------------------------------------------ */
+interface Particle { id: number; owner: string | number; x: number; y: number; tx: number; ty: number }
+const particles = ref<Particle[]>([]);
+let particleId = 0;
+
+function burst(e: MouseEvent, ownerId: string | number) {
+  if (prefersReducedMotion.value) return;
+  const el = e.currentTarget as HTMLElement;
+  const rect = el.getBoundingClientRect();
+  const originX = e.clientX - rect.left;
+  const originY = e.clientY - rect.top;
+  const count = 7;
+  for (let i = 0; i < count; i++) {
+    const angle = (Math.PI * 2 * i) / count + Math.random() * 0.4;
+    const dist = 30 + Math.random() * 24;
+    const id = particleId++;
+    particles.value.push({
+      id,
+      owner: ownerId,
+      x: originX,
+      y: originY,
+      tx: Math.cos(angle) * dist,
+      ty: Math.sin(angle) * dist,
+    });
+    setTimeout(() => {
+      particles.value = particles.value.filter((p) => p.id !== id);
+    }, 600);
+  }
+}
+
+function handleOpen(e: MouseEvent, cert: any) {
+  burst(e, cert.id);
+  openCertificate(cert.pdf_url, cert.title);
+}
+
+onMounted(() => {
+  prefersReducedMotion.value = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+});
 </script>
 
 <template>
@@ -42,12 +100,17 @@ const openCertificate = (url: string, title: string) => {
         <div 
           v-for="(cert, index) in data" 
           :key="cert.id"
-          class="group relative bg-zinc-900 border border-zinc-800 hover:border-brand-primary/50 rounded-xl overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-brand-primary/10"
+          class="tilt-card group relative bg-zinc-900 border border-zinc-800 hover:border-brand-primary/50 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-brand-primary/10"
           data-aos="fade-up"
           :data-aos-delay="index * 100"
+          @mousemove="onCardMove"
+          @mouseleave="onCardLeave"
         >
           <div class="aspect-[4/3] bg-zinc-800 relative overflow-hidden">
             <div class="absolute inset-0 bg-brand-primary/10 mix-blend-overlay opacity-0 group-hover:opacity-100 transition-opacity z-10"></div>
+
+            <!-- Efek shine menyapu saat kartu di-hover -->
+            <div class="shine absolute inset-0 z-10 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 pointer-events-none"></div>
             
             <img 
               v-if="cert.image_url" 
@@ -61,9 +124,16 @@ const openCertificate = (url: string, title: string) => {
 
             <button 
               v-if="cert.pdf_url" 
-              @click="openCertificate(cert.pdf_url, cert.title)"
-              class="absolute inset-0 z-20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/60 backdrop-blur-[2px] cursor-pointer"
+              @click="handleOpen($event, cert)"
+              :aria-label="`Lihat sertifikat ${cert.title}`"
+              class="absolute inset-0 z-20 flex items-center justify-center opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity duration-300 bg-black/60 backdrop-blur-[2px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
             >
+              <span
+                v-for="p in particles.filter(p => p.owner === cert.id)"
+                :key="p.id"
+                class="particle"
+                :style="{ left: p.x + 'px', top: p.y + 'px', '--tx': p.tx + 'px', '--ty': p.ty + 'px' }"
+              ></span>
               <span class="px-4 py-2 bg-brand-primary hover:bg-brand-primary-light text-white rounded-full text-sm font-semibold flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 shadow-lg shadow-brand-primary/20">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
                 Lihat Sertifikat
@@ -98,3 +168,46 @@ const openCertificate = (url: string, title: string) => {
 
   </section>
 </template>
+
+<style scoped>
+/* Tilt 3D kartu: transform diatur lewat JS, di sini cukup transisinya */
+.tilt-card {
+  transition: transform 0.2s ease-out, border-color 0.3s, box-shadow 0.3s;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* Partikel kecil saat tombol "Lihat Sertifikat" diklik */
+.particle {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 9999px;
+  background: #ffffff;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  animation: cert-particle-burst 0.55s ease-out forwards;
+}
+@keyframes cert-particle-burst {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) translate(0, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translate(var(--tx), var(--ty)) scale(0.3);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tilt-card {
+    transition: none;
+  }
+  .shine {
+    display: none;
+  }
+  .particle {
+    display: none;
+  }
+}
+</style>
