@@ -27,6 +27,7 @@ const publicationsWrap = ref<HTMLElement | null>(null);
 const certificationsWrap = ref<HTMLElement | null>(null);
 const visibleSections = ref(new Set<string>());
 let sectionObserver: IntersectionObserver | null = null;
+let revealFallbackTimeout: ReturnType<typeof setTimeout> | null = null;
 
 const prefersReducedMotion = ref(false);
 
@@ -60,12 +61,27 @@ function setupSectionObserver() {
         }
       });
     },
-    { threshold: 0.15, rootMargin: '0px 0px -60px 0px' }
+    // threshold 0 (bukan 0.15): di mobile, section jadi 1-kolom dan bisa jauh lebih tinggi
+    // dari desktop. Threshold 0.15 berarti nunggu 15% dari TOTAL tinggi section kelihatan
+    // dulu baru reveal — untuk section setinggi ribuan px itu bisa berarti harus scroll
+    // ratusan px ke DALAM section sebelum kontennya muncul, kelihatan kayak "kosong hitam".
+    // threshold 0 + rootMargin bikin reveal trigger begitu ujung section mulai nongol.
+    { threshold: 0, rootMargin: '0px 0px -60px 0px' }
   );
 
   [projectsWrap.value, publicationsWrap.value, certificationsWrap.value].forEach((el) => {
     if (el) sectionObserver?.observe(el);
   });
+
+  // Jaring pengaman: kalau karena alasan apapun observer tidak pernah trigger
+  // (bug browser tertentu, dsb), paksa semua section tetap muncul setelah 3 detik
+  // supaya konten tidak pernah nyangkut permanen dalam keadaan tak terlihat.
+  if (revealFallbackTimeout) clearTimeout(revealFallbackTimeout);
+  revealFallbackTimeout = setTimeout(() => {
+    visibleSections.value.add('projects');
+    visibleSections.value.add('publications');
+    visibleSections.value.add('certifications');
+  }, 3000);
 }
 
 // Setelah preloader selesai dan section ter-render, pasang observer
@@ -123,6 +139,7 @@ onMounted(async () => {
 onUnmounted(() => {
   window.removeEventListener('scroll', onScroll);
   if (progressInterval) clearInterval(progressInterval);
+  if (revealFallbackTimeout) clearTimeout(revealFallbackTimeout);
   sectionObserver?.disconnect();
 });
 </script>

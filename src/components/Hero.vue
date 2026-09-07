@@ -3,7 +3,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 
 /* ------------------------------------------------------------------ */
-/* State dasar                                                         */
+/* State dasar                                                        */
 /* ------------------------------------------------------------------ */
 const scrollY = ref(0)
 const isVisible = ref(false) // dipakai untuk sequence entrance saat load
@@ -23,7 +23,7 @@ const particles = ref<Particle[]>([])
 let particleId = 0
 
 /* ------------------------------------------------------------------ */
-/* Scroll handling                                                     */
+/* Scroll handling                                                    */
 /* ------------------------------------------------------------------ */
 function onScroll() {
   scrollY.value = window.scrollY
@@ -59,7 +59,7 @@ const scrollHintStyle = computed(() => ({
 }))
 
 /* ------------------------------------------------------------------ */
-/* Tilt 3D foto profil                                                  */
+/* Tilt 3D foto profil                                                */
 /* ------------------------------------------------------------------ */
 function onProfileMove(e: MouseEvent) {
   if (prefersReducedMotion.value) return
@@ -79,7 +79,7 @@ const profileTiltStyle = computed(() => ({
 }))
 
 /* ------------------------------------------------------------------ */
-/* Magnetic button                                                      */
+/* Magnetic button                                                    */
 /* ------------------------------------------------------------------ */
 function magnetize(e: MouseEvent, target: 'primary' | 'secondary') {
   if (prefersReducedMotion.value) return
@@ -102,7 +102,7 @@ const secondaryBtnStyle = computed(() => ({
 }))
 
 /* ------------------------------------------------------------------ */
-/* Burst partikel saat klik CTA                                        */
+/* Burst partikel saat klik CTA                                       */
 /* ------------------------------------------------------------------ */
 function burst(e: MouseEvent, color: string) {
   if (prefersReducedMotion.value) return
@@ -138,7 +138,7 @@ function scrollToNext() {
 }
 
 /* ------------------------------------------------------------------ */
-/* Lifecycle                                                            */
+/* Lifecycle                                                          */
 /* ------------------------------------------------------------------ */
 onMounted(() => {
   prefersReducedMotion.value = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -180,64 +180,91 @@ onUnmounted(() => {
           </kinesis-element>
         </div>
 
-        <kinesis-element :strength="30" type="depth" class="mb-8 relative inline-block group">
+        <!-- FOTO PROFIL & FLOATING BADGES -->
+        <kinesis-element :strength="30" type="depth" class="mb-10 relative inline-block group">
           <div
-            class="reveal-scale"
+            class="reveal-scale relative"
             :class="{ 'reveal-scale--visible': isVisible }"
             @mousemove="onProfileMove"
             @mouseleave="resetProfileTilt"
           >
-            <div class="absolute inset-0 bg-gradient-to-tr from-brand-primary to-fuchsia-500 rounded-full blur-lg opacity-50 group-hover:opacity-75 transition-opacity duration-500"></div>
+            <!-- Glowing background -->
+            <div class="absolute inset-0 bg-gradient-to-tr from-brand-primary to-fuchsia-500 rounded-full blur-xl opacity-40 group-hover:opacity-75 transition-opacity duration-500"></div>
+            
             <img
               src="/images/profiles.jpg"
               alt="Foto Muhammad Rifky"
-              class="tilt-photo relative w-40 h-40 md:w-48 md:h-48 rounded-full mx-auto border-[3px] border-brand-bg p-1 ring-2 ring-brand-primary/50 group-hover:ring-brand-primary transition-all duration-500 object-cover shadow-2xl"
+              class="tilt-photo relative w-40 h-40 md:w-48 md:h-48 rounded-full mx-auto border-[3px] border-brand-bg p-1 ring-2 ring-brand-primary/50 group-hover:ring-brand-primary transition-all duration-500 object-cover shadow-2xl z-10"
               :style="profileTiltStyle"
             >
+
+            <!-- Floating Tech Stack Ornaments -->
+            <div class="absolute -top-2 -right-4 bg-brand-bg/80 backdrop-blur-md border border-brand-primary/30 px-3 py-1.5 rounded-xl text-xs font-bold text-brand-text shadow-lg transform rotate-6 z-20 animate-float">Vue.js</div>
+            <div class="absolute top-1/2 -left-8 bg-brand-bg/80 backdrop-blur-md border border-fuchsia-500/30 px-3 py-1.5 rounded-xl text-xs font-bold text-brand-text shadow-lg transform -rotate-12 z-20 animate-float-delayed">Golang</div>
+            <div class="absolute -bottom-2 -right-2 bg-brand-bg/80 backdrop-blur-md border border-blue-500/30 px-3 py-1.5 rounded-xl text-xs font-bold text-brand-text shadow-lg transform rotate-3 z-20 animate-float">Kotlin</div>
           </div>
         </kinesis-element>
 
-        <div class="space-y-4 max-w-3xl mx-auto">
+        <div class="space-y-4 max-w-3xl mx-auto flex flex-col items-center">
+          
+          <!-- HIRE ME BADGE (NEW) -->
+          <kinesis-element :strength="10" type="depth">
+            <div 
+              class="reveal-up inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-primary/10 border border-brand-primary/30 text-brand-primary text-xs md:text-sm font-semibold mb-2 backdrop-blur-sm"
+              :class="{ 'reveal-up--visible': isVisible }"
+              style="transition-delay: 0.05s"
+            >
+              <span class="relative flex h-2.5 w-2.5">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+              </span>
+              Fresh Graduate • Available for Work
+            </div>
+          </kinesis-element>
+
+          <!-- NAMA -->
           <kinesis-element :strength="10" type="depth">
             <h2
               class="reveal-up text-xl md:text-2xl font-medium text-brand-text/80"
               :class="{ 'reveal-up--visible': isVisible }"
-              style="transition-delay: 0.05s"
+              style="transition-delay: 0.15s"
             >
               Halo, saya <span class="text-brand-text font-bold">MUHAMMAD RIFKY</span>
             </h2>
           </kinesis-element>
 
+          <!-- ROLE -->
           <kinesis-element :strength="20" type="depth">
             <h1
               class="reveal-up text-4xl md:text-6xl font-extrabold tracking-tight leading-tight"
               :class="{ 'reveal-up--visible': isVisible }"
-              style="transition-delay: 0.15s"
+              style="transition-delay: 0.25s"
             >
               <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary via-fuchsia-400 to-brand-primary bg-[length:200%_auto] animate-gradient">
-                Frontend & Mobile Developer
+                Full-Stack & Mobile Developer
               </span>
             </h1>
           </kinesis-element>
 
+          <!-- DESKRIPSI (UPDATED) -->
           <kinesis-element :strength="15" type="depth_inv">
             <p
               class="reveal-up text-lg md:text-xl text-brand-subtext"
               :class="{ 'reveal-up--visible': isVisible }"
-              style="transition-delay: 0.25s"
+              style="transition-delay: 0.35s"
             >
-              Mahasiswa D4 Teknik Informatika di <b class="text-brand-text">ULBI</b>.
-              <br class="md:hidden"> Fokus pada UI/UX & Mobile, dengan kemampuan <span class="text-brand-primary font-semibold">Fullstack</span> yang solid.
+              Lulusan D4 Teknik Informatika dari <b class="text-brand-text">ULBI</b>.
+              <br class="hidden md:block"> Membawa <span class="text-brand-primary font-semibold">3 tahun pengalaman profesional</span> dalam membangun arsitektur Web & Mobile modern.
             </p>
           </kinesis-element>
 
           <kinesis-element :strength="5">
             <p
-              class="reveal-up max-w-xl mx-auto text-brand-subtext/80 mt-6 text-base leading-relaxed"
+              class="reveal-up max-w-xl mx-auto text-brand-subtext/80 mt-4 text-sm md:text-base leading-relaxed"
               :class="{ 'reveal-up--visible': isVisible }"
-              style="transition-delay: 0.35s"
+              style="transition-delay: 0.45s"
             >
-              Saya menggabungkan desain antarmuka yang intuitif dengan performa backend yang handal untuk menciptakan aplikasi web dan mobile yang luar biasa.
+              Saya menggabungkan antarmuka interaktif yang dibangun sendiri secara penuh dengan performa backend yang tangguh untuk menciptakan ekosistem aplikasi yang *scalable* dan berdampak nyata.
             </p>
           </kinesis-element>
         </div>
@@ -245,7 +272,7 @@ onUnmounted(() => {
         <div
           class="reveal-up flex flex-col sm:flex-row justify-center gap-4 mt-10"
           :class="{ 'reveal-up--visible': isVisible }"
-          style="transition-delay: 0.45s"
+          style="transition-delay: 0.55s"
         >
           <kinesis-element :strength="5" type="depth" class="w-full sm:w-auto">
             <a
@@ -319,6 +346,19 @@ onUnmounted(() => {
   animation: gradient-shift 5s ease infinite;
 }
 
+/* Floating animation untuk tech stack orbs */
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(var(--tw-rotate)); }
+  50% { transform: translateY(-10px) rotate(var(--tw-rotate)); }
+}
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+.animate-float-delayed {
+  animation: float 5s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
 /* Sequence masuk: fade + naik sedikit, dengan delay bertahap per elemen */
 .reveal-up {
   opacity: 0;
@@ -381,7 +421,10 @@ onUnmounted(() => {
     transform: none;
     transition: none;
   }
-  .animate-bounce {
+  .animate-bounce,
+  .animate-ping,
+  .animate-float,
+  .animate-float-delayed {
     animation: none;
   }
   .tilt-photo,
