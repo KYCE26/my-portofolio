@@ -101,3 +101,4 @@ dist
 dist
 dist-ssr
 *.pem
+.aider*
