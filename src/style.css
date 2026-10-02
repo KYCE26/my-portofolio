@@ -5,7 +5,6 @@
 @layer base {
   html, body {
     width: 100%;
-    /* overflow-x: hidden; removed per instructions */
   }
 
   /* Disable ligatures for mono metadata */
@@ -15,8 +14,8 @@
 
   /* Global focus state for interactive elements */
   *:focus-visible {
-    outline: 2px solid #1d4ed8 !important;
-    outline-offset: 2px !important;
+    outline: 2px solid theme('colors.brand-focus');
+    outline-offset: 2px;
   }
 
   /* Accessibility: Prefers Reduced Motion */
