@@ -7,22 +7,27 @@ export default {
   theme: {
     extend: {
       colors: {
-        'brand-bg': '#18181b',      // Zinc 900 -> Latar belakang utama
-        'brand-surface': '#27272a', // Zinc 800 -> Latar belakang kartu/seksi
-        'brand-primary': '#d946ef', // Fuchsia 500 -> Aksen utama (link, tombol)
-        'brand-primary-dark': '#c026d3', // Fuchsia 600 -> Saat hover (Saya rename agar lebih konsisten)
-        'brand-text': '#f4f4f5',      // Zinc 100 -> Teks utama (putih pudar)
-        'brand-subtext': '#a1a1aa',   // Zinc 400 -> Teks deskripsi
+        'brand-bg': '#fcfcfc',
+        'brand-surface': '#f4f4f5',
+        'brand-primary': '#b8152e',
+        'brand-primary-dark': '#9f1228',
+        'brand-text': '#18181b',
+        'brand-subtext': '#52525b',
+        'brand-focus': '#1d4ed8',
       },
-      // Kita bisa tambahkan font kustom di sini nanti jika mau
-      // fontFamily: {
-      //   sans: ['Inter', 'sans-serif'],
-      // },
+      fontFamily: {
+        sans: ['"Public Sans"', 'sans-serif'],
+        serif: ['Lora', 'serif'],
+        mono: ['"Fira Code"', 'monospace'],
+      },
+      spacing: {
+        'hero-projects': 'clamp(4rem, 8vw, 10rem)',
+        'projects-pubs': 'clamp(3rem, 6vw, 7.5rem)',
+        'pubs-cert': 'clamp(4rem, 10vw, 9rem)',
+      },
     },
   },
   plugins: [
-    // PLUGIN WAJIB!
-    // Ini diperlukan untuk kelas 'line-clamp-3' di ProjectCard.vue
     require('@tailwindcss/line-clamp'),
   ],
 }

@@ -1,13 +1,33 @@
-/* src/style.css */
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* TAMBAHKAN INI DI BAGIAN BAWAH */
-html, body {
-  overflow-x: hidden;
-  width: 100%;
+@layer base {
+  html, body {
+    width: 100%;
+    /* overflow-x: hidden; removed per instructions */
+  }
+
+  /* Disable ligatures for mono metadata */
+  .font-mono {
+    font-variant-ligatures: none;
+  }
+
+  /* Global focus state for interactive elements */
+  *:focus-visible {
+    outline: 2px solid #1d4ed8 !important;
+    outline-offset: 2px !important;
+  }
+
+  /* Accessibility: Prefers Reduced Motion */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
