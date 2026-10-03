@@ -1,7 +1,6 @@
 import axios from 'axios';
 
-// Ganti URL Railway jadi path relatif (slash api)
-const API_URL = '/api';
+const API_URL = 'https://api-portfolio.kyce.my.id/api';
 
 export const api = axios.create({
   baseURL: API_URL,
@@ -10,5 +9,4 @@ export const api = axios.create({
   }
 });
 
-// Helper biar gampang panggil endpoint gambar (Supabase biarin aja, ini udah bener)
 export const STORAGE_URL = 'https://qiouupklvkgrlxlkevns.supabase.co/storage/v1/object/public/portfolio-assets';
