@@ -1,4 +1,4 @@
-@tailwind base;
+﻿@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -15,7 +15,7 @@
 
   /* Global focus state for interactive elements */
   *:focus-visible {
-    outline: 2px solid #1d4ed8 !important;
+    outline: 2px solid #ea580c !important;
     outline-offset: 2px !important;
   }
 

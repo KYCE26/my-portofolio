@@ -1,4 +1,4 @@
-/** @type {import('tailwindcss').Config} */
+﻿/** @type {import('tailwindcss').Config} */
 export default {
   content: [
     "./index.html",
@@ -7,13 +7,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        'brand-bg': '#fcfcfc',
+        'brand-bg': '#ffffff',
         'brand-surface': '#f4f4f5',
-        'brand-primary': '#b8152e',
-        'brand-primary-dark': '#9f1228',
-        'brand-text': '#18181b',
+        'brand-primary': '#ea580c',
+        'brand-primary-dark': '#c2410c',
+        'brand-text': '#09090b',
         'brand-subtext': '#52525b',
-        'brand-focus': '#1d4ed8',
+        'brand-focus': '#ea580c',
       },
       fontFamily: {
         sans: ['"Public Sans"', 'sans-serif'],
