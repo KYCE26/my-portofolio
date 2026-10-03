@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { defineProps } from 'vue';
 
 const props = defineProps<{
@@ -13,7 +13,7 @@ function formatYear(dateStr: string) {
 
 <template>
   <section id="tulisan" class="py-24 px-6 md:px-8 border-t border-brand-surface bg-brand-bg">
-    <div class="max-w-4xl mx-auto">
+    <div class="max-w-6xl mx-auto">
       
       <div class="mb-16">
         <h2 class="font-serif text-3xl md:text-5xl font-bold tracking-tight text-brand-text mb-4 uppercase">
@@ -28,7 +28,7 @@ function formatYear(dateStr: string) {
         <div 
           v-for="pub in data" 
           :key="pub.id"
-          class="group flex flex-col md:flex-row md:items-baseline gap-2 md:gap-4 py-4 border-b border-brand-surface hover:border-brand-text transition-colors duration-0"
+          class="group flex flex-col md:flex-row md:items-baseline gap-2 md:gap-4 py-6 border-b border-brand-surface hover:border-brand-text transition-colors duration-0"
         >
           <div class="font-mono text-sm text-brand-subtext shrink-0 md:w-16">
             {{ formatYear(pub.created_at) }}
@@ -46,14 +46,14 @@ function formatYear(dateStr: string) {
             v-if="pub.link" 
             :href="pub.link" 
             target="_blank" 
-            class="text-sm font-bold text-brand-text underline decoration-2 underline-offset-4 decoration-transparent hover:decoration-brand-text transition-all duration-0 ml-0 md:ml-4 focus-visible:outline-2 focus-visible:outline-brand-focus"
+            class="text-xs font-bold text-brand-text uppercase tracking-widest hover:text-brand-primary transition-colors focus-visible:outline-2 focus-visible:outline-brand-focus ml-0 md:ml-4 whitespace-nowrap"
           >
-            BACA PDF
+            BACA ARTIKEL
           </a>
         </div>
       </div>
 
-      <div v-if="data.length === 0" class="py-20 border border-brand-text text-center mt-4">
+      <div v-if="data.length === 0" class="py-20 border border-brand-text text-center mt-4 bg-brand-surface">
         <p class="font-mono text-sm tracking-widest text-brand-text uppercase">Belum ada publikasi.</p>
       </div>
 
