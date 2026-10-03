@@ -3,31 +3,48 @@
 @tailwind utilities;
 
 @layer base {
-  html, body {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
     width: 100%;
-    /* overflow-x: hidden; removed per instructions */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: theme('colors.brand-bg');
+    color: theme('colors.brand-text');
   }
 
-  /* Disable ligatures for mono metadata */
   .font-mono {
     font-variant-ligatures: none;
   }
 
-  /* Global focus state for interactive elements */
   *:focus-visible {
-    outline: 2px solid #ea580c !important;
+    outline: 2px solid theme('colors.brand-focus') !important;
     outline-offset: 2px !important;
   }
 
-  /* Accessibility: Prefers Reduced Motion */
+  ::selection {
+    background-color: theme('colors.brand-primary');
+    color: theme('colors.brand-bg');
+  }
+
   @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
     *,
     ::before,
     ::after {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
     }
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
   }
 }

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { api } from '../config/api';
 
@@ -117,197 +117,188 @@ onMounted(() => {
 });
 </script>
 
+
 <template>
-  <div class="min-h-screen bg-[#050505] text-zinc-200 relative overflow-x-hidden font-sans selection:bg-brand-primary/30 selection:text-brand-primary">
+  <div class="min-h-screen bg-brand-bg font-sans selection:bg-brand-primary selection:text-white">
     
-    <transition name="fade">
-      <div v-if="!isAuthenticated" class="fixed inset-0 z-50 flex items-center justify-center bg-black">
-        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#333 1px, transparent 1px); background-size: 30px 30px;"></div>
+    <!-- Login Screen -->
+    <div v-if="!isAuthenticated" class="min-h-screen flex items-center justify-center p-6 bg-brand-surface">
+      <div class="w-full max-w-sm bg-white border border-brand-border p-8 md:p-12 shadow-sm">
+        <h1 class="font-serif text-3xl font-bold text-brand-text mb-2 tracking-tight">Rifky.Admin</h1>
+        <p class="font-mono text-xs text-brand-subtext uppercase tracking-widest mb-8">Access Required</p>
         
-        <div class="relative w-full max-w-md p-8 bg-zinc-900/50 backdrop-blur-xl border border-zinc-800 rounded-3xl shadow-2xl flex flex-col items-center">
-          <div class="w-20 h-20 bg-zinc-800/80 rounded-2xl flex items-center justify-center mb-6 ring-4 ring-black shadow-inner">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-primary"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          </div>
-          
-          <h2 class="text-2xl font-bold text-white mb-2">Restricted Area</h2>
-          <p class="text-zinc-500 text-sm mb-8 text-center">Masukkan kode otentikasi untuk mengakses panel admin.</p>
-
-          <form @submit.prevent="checkAuth" class="w-full space-y-4">
-            <div class="relative">
-              <input 
-                v-model="inputCode" 
-                type="password" 
-                placeholder="ACCESS CODE" 
-                class="w-full text-center text-xl tracking-[0.5em] font-mono bg-black/50 border border-zinc-700 focus:border-brand-primary rounded-xl p-4 text-white outline-none transition-all duration-300 focus:ring-2 focus:ring-brand-primary/20"
-                autofocus
-              >
-            </div>
-            
-            <button 
-              type="submit" 
-              class="w-full bg-brand-primary hover:bg-brand-primary-light text-white font-bold py-4 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-brand-primary/20 active:scale-95"
+        <form @submit.prevent="checkAuth" class="space-y-6">
+          <div>
+            <label class="block font-mono text-xs font-bold text-brand-text uppercase mb-2">Secret Code</label>
+            <input 
+              v-model="inputCode" 
+              type="password" 
+              class="w-full bg-brand-bg border border-brand-border p-3 text-sm text-brand-text focus:border-brand-primary outline-none transition-colors"
+              placeholder="•••••"
+              autofocus
             >
-              AUTHENTICATE
-            </button>
-          </form>
-
-          <p v-if="authError" class="mt-4 text-red-500 font-bold text-sm animate-pulse flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            ACCESS DENIED
-          </p>
-
-          <router-link to="/" class="mt-8 text-xs text-zinc-600 hover:text-white transition-colors">
-            ← Kembali ke Public Home
-          </router-link>
-        </div>
+          </div>
+          <button type="submit" class="w-full bg-brand-text hover:bg-brand-primary text-brand-bg font-bold py-3 px-4 uppercase text-xs tracking-widest transition-colors duration-200">
+            Authenticate
+          </button>
+          <p v-if="authError" class="text-brand-primary text-xs font-mono font-bold">Error: Invalid Code</p>
+        </form>
       </div>
-    </transition>
+    </div>
 
-    <div v-if="isAuthenticated" class="p-6 lg:p-10 max-w-7xl mx-auto">
+    <!-- Dashboard -->
+    <div v-else class="max-w-7xl mx-auto px-6 md:px-12 py-12 md:py-20">
       
-      <header class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-6">
         <div>
-          <h1 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-fuchsia-500 mb-1">
-            Command Center
-          </h1>
-          <p class="text-zinc-500 text-sm">Selamat datang kembali, Admin.</p>
+          <h1 class="font-serif text-4xl md:text-5xl font-bold text-brand-text tracking-tight mb-2">Command Center</h1>
+          <p class="font-mono text-xs text-brand-subtext uppercase tracking-widest">Manage Portfolio Content</p>
         </div>
-        <button @click="logout" class="px-5 py-2.5 rounded-lg bg-zinc-900 border border-zinc-700 text-zinc-400 hover:text-white hover:bg-red-500/10 hover:border-red-500/50 transition-all text-sm font-medium flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          Terminate Session
-        </button>
-      </header>
-
-      <div class="flex p-1 bg-zinc-900/80 backdrop-blur border border-zinc-800 rounded-xl mb-8 w-full md:w-fit">
-        <button 
-          v-for="tab in ['projects', 'certificates', 'publications']" 
-          :key="tab"
-          @click="activeTab = tab as any"
-          class="flex-1 md:flex-none px-6 py-2.5 rounded-lg text-sm font-medium capitalize transition-all duration-300 relative overflow-hidden"
-          :class="activeTab === tab ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/20' : 'text-zinc-400 hover:text-white hover:bg-white/5'"
-        >
-          {{ tab }}
+        <button @click="logout" class="border border-brand-border hover:border-brand-text text-brand-text font-bold py-2 px-6 text-xs uppercase tracking-widest transition-colors">
+          Logout
         </button>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
         
-        <div class="lg:col-span-4 xl:col-span-3">
-          <div class="sticky top-8 bg-zinc-900/60 backdrop-blur-xl border border-zinc-800 rounded-2xl p-6 shadow-xl">
-            <h2 class="text-lg font-semibold text-white mb-6 flex items-center gap-2">
-              <span class="w-2 h-6 bg-brand-primary rounded-full"></span>
-              Input New Data
-            </h2>
+        <!-- Sidebar / Forms -->
+        <div class="lg:col-span-4 space-y-12">
+          
+          <div class="flex flex-wrap gap-2">
+            <button 
+              @click="activeTab = 'projects'" 
+              :class="activeTab === 'projects' ? 'bg-brand-text text-white' : 'border border-brand-border bg-white text-brand-subtext hover:border-brand-text hover:text-brand-text'"
+              class="px-4 py-2 text-xs font-bold uppercase tracking-widest transition-colors"
+            >Projects</button>
+            <button 
+              @click="activeTab = 'certificates'"
+              :class="activeTab === 'certificates' ? 'bg-brand-text text-white' : 'border border-brand-border bg-white text-brand-subtext hover:border-brand-text hover:text-brand-text'"
+              class="px-4 py-2 text-xs font-bold uppercase tracking-widest transition-colors"
+            >Certs</button>
+            <button 
+              @click="activeTab = 'publications'"
+              :class="activeTab === 'publications' ? 'bg-brand-text text-white' : 'border border-brand-border bg-white text-brand-subtext hover:border-brand-text hover:text-brand-text'"
+              class="px-4 py-2 text-xs font-bold uppercase tracking-widest transition-colors"
+            >Pubs</button>
+          </div>
 
-            <form v-if="activeTab === 'projects'" @submit.prevent="submitProject" class="space-y-4">
-              <input v-model="projectForm.title" placeholder="Judul Project" class="glass-input" required>
-              <textarea v-model="projectForm.description" placeholder="Deskripsi Singkat" rows="4" class="glass-input" required></textarea>
-              <input v-model="projectForm.tags" placeholder="Tags (Vue, TypeScript)" class="glass-input">
-              <div class="grid grid-cols-2 gap-3">
-                <input v-model="projectForm.repo_url" placeholder="Repo URL" class="glass-input text-xs">
-                <input v-model="projectForm.demo_url" placeholder="Demo URL" class="glass-input text-xs">
+          <div class="bg-white border border-brand-border p-6 md:p-8">
+            <h2 class="font-serif text-xl font-bold text-brand-text mb-6">New Entry</h2>
+
+            <form v-if="activeTab === 'projects'" @submit.prevent="submitProject" class="space-y-5">
+              <input v-model="projectForm.title" placeholder="Project Title" class="editorial-input" required>
+              <textarea v-model="projectForm.description" placeholder="Description" rows="3" class="editorial-input"></textarea>
+              <input v-model="projectForm.tags" placeholder="Tags (comma separated)" class="editorial-input">
+              <div class="grid grid-cols-2 gap-4">
+                <input v-model="projectForm.repo_url" placeholder="Repo URL" class="editorial-input">
+                <input v-model="projectForm.demo_url" placeholder="Demo URL" class="editorial-input">
               </div>
-              <div class="space-y-1">
-                <label class="text-[10px] uppercase tracking-wider text-zinc-500 font-bold ml-1">Thumbnail</label>
-                <input @change="handleProjectFile" type="file" accept="image/*" class="glass-file">
+              <div class="space-y-2">
+                <label class="block font-mono text-[10px] font-bold text-brand-subtext uppercase tracking-widest">Cover Image</label>
+                <input @change="handleProjectFile" type="file" accept="image/*" class="w-full text-xs text-brand-subtext cursor-pointer file:cursor-pointer file:border-0 file:bg-brand-surface file:text-brand-text file:px-4 file:py-2 file:font-mono file:uppercase file:text-[10px] file:tracking-widest file:font-bold hover:file:bg-brand-text hover:file:text-white file:transition-colors">
               </div>
-              <button type="submit" :disabled="isSubmitting" class="glass-btn">
-                {{ isSubmitting ? 'Uploading...' : 'Deploy Project 🚀' }}
+              <button type="submit" :disabled="isSubmitting" class="w-full bg-brand-primary hover:bg-brand-primary-dark text-white font-bold py-3 px-4 uppercase text-xs tracking-widest transition-colors disabled:opacity-50">
+                {{ isSubmitting ? 'Uploading...' : 'Publish Project' }}
               </button>
             </form>
 
-            <form v-if="activeTab === 'certificates'" @submit.prevent="submitCertificate" class="space-y-4">
-              <input v-model="certForm.title" placeholder="Nama Sertifikat" class="glass-input" required>
-              <input v-model="certForm.issuer" placeholder="Penerbit (Google, Udemy)" class="glass-input" required>
-              <div class="space-y-1">
-                <label class="text-[10px] uppercase tracking-wider text-zinc-500 font-bold ml-1">Gambar Preview</label>
-                <input @change="handleCertImage" type="file" accept="image/*" class="glass-file">
+            <form v-if="activeTab === 'certificates'" @submit.prevent="submitCertificate" class="space-y-5">
+              <input v-model="certForm.title" placeholder="Certificate Title" class="editorial-input" required>
+              <input v-model="certForm.issuer" placeholder="Issuer (e.g., Oracle)" class="editorial-input" required>
+              <div class="space-y-2">
+                <label class="block font-mono text-[10px] font-bold text-brand-subtext uppercase tracking-widest">Preview Image</label>
+                <input @change="handleCertImage" type="file" accept="image/*" class="w-full text-xs text-brand-subtext cursor-pointer file:cursor-pointer file:border-0 file:bg-brand-surface file:text-brand-text file:px-4 file:py-2 file:font-mono file:uppercase file:text-[10px] file:tracking-widest file:font-bold hover:file:bg-brand-text hover:file:text-white file:transition-colors">
               </div>
-              <div class="space-y-1">
-                <label class="text-[10px] uppercase tracking-wider text-zinc-500 font-bold ml-1">Dokumen PDF</label>
-                <input @change="handleCertPdf" type="file" accept="application/pdf" class="glass-file">
+              <div class="space-y-2">
+                <label class="block font-mono text-[10px] font-bold text-brand-subtext uppercase tracking-widest">PDF Document</label>
+                <input @change="handleCertPdf" type="file" accept="application/pdf" class="w-full text-xs text-brand-subtext cursor-pointer file:cursor-pointer file:border-0 file:bg-brand-surface file:text-brand-text file:px-4 file:py-2 file:font-mono file:uppercase file:text-[10px] file:tracking-widest file:font-bold hover:file:bg-brand-text hover:file:text-white file:transition-colors">
               </div>
-              <button type="submit" :disabled="isSubmitting" class="glass-btn">
-                {{ isSubmitting ? 'Uploading...' : 'Save Certificate 🎓' }}
+              <button type="submit" :disabled="isSubmitting" class="w-full bg-brand-primary hover:bg-brand-primary-dark text-white font-bold py-3 px-4 uppercase text-xs tracking-widest transition-colors disabled:opacity-50">
+                {{ isSubmitting ? 'Uploading...' : 'Save Certificate' }}
               </button>
             </form>
 
-            <form v-if="activeTab === 'publications'" @submit.prevent="submitPublication" class="space-y-4">
-              <input v-model="pubForm.title" placeholder="Judul Tulisan" class="glass-input" required>
+            <form v-if="activeTab === 'publications'" @submit.prevent="submitPublication" class="space-y-5">
+              <input v-model="pubForm.title" placeholder="Publication Title" class="editorial-input" required>
               <div class="relative">
-                <select v-model="pubForm.type" class="glass-input appearance-none cursor-pointer">
+                <select v-model="pubForm.type" class="editorial-input appearance-none cursor-pointer">
                   <option value="Artikel">Artikel</option>
                   <option value="Buku">Buku</option>
+                  <option value="Jurnal">Jurnal</option>
+                  <option value="Video">Video</option>
                 </select>
-                <div class="absolute right-3 top-3 pointer-events-none text-zinc-500">▼</div>
+                <div class="absolute right-4 top-3 pointer-events-none text-brand-subtext font-mono text-xs">▼</div>
               </div>
-              <textarea v-model="pubForm.description" placeholder="Deskripsi Singkat" rows="3" class="glass-input"></textarea>
-              <input v-model="pubForm.link" placeholder="Link URL" class="glass-input">
-              <button type="submit" :disabled="isSubmitting" class="glass-btn">
-                {{ isSubmitting ? 'Saving...' : 'Publish Now 📚' }}
+              <textarea v-model="pubForm.description" placeholder="Short Description" rows="3" class="editorial-input"></textarea>
+              <input v-model="pubForm.link" placeholder="External URL" class="editorial-input">
+              <button type="submit" :disabled="isSubmitting" class="w-full bg-brand-primary hover:bg-brand-primary-dark text-white font-bold py-3 px-4 uppercase text-xs tracking-widest transition-colors disabled:opacity-50">
+                {{ isSubmitting ? 'Saving...' : 'Publish Record' }}
               </button>
             </form>
 
           </div>
         </div>
 
-        <div class="lg:col-span-8 xl:col-span-9">
+        <!-- Data Display -->
+        <div class="lg:col-span-8">
           
-          <div class="flex items-center justify-between mb-6">
-            <h2 class="text-lg font-semibold text-white">Database Records</h2>
-            <div v-if="isLoading" class="flex items-center gap-2 text-xs text-brand-primary animate-pulse">
-              <span class="w-2 h-2 bg-brand-primary rounded-full"></span> Syncing...
+          <div class="flex items-center justify-between mb-8 pb-4 border-b border-brand-border">
+            <h2 class="font-serif text-2xl font-bold text-brand-text">Active Records</h2>
+            <div v-if="isLoading" class="font-mono text-xs uppercase tracking-widest text-brand-primary animate-pulse">
+              Syncing...
             </div>
           </div>
 
-          <transition-group name="list" tag="div" class="grid grid-cols-1 md:grid-cols-2 gap-4" v-if="activeTab === 'projects'">
-            <div v-for="item in projects" :key="item.id" class="glass-card group">
-              <div class="relative h-40 overflow-hidden">
-                <img v-if="item.image_url" :src="item.image_url" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                <div v-else class="w-full h-full bg-zinc-800 flex items-center justify-center text-zinc-600 text-xs">No Image</div>
-                <div class="absolute top-2 right-2 flex gap-1">
-                   <button @click="deleteItem('projects', item.id)" class="p-2 bg-black/50 backdrop-blur hover:bg-red-500 text-white rounded-lg transition-colors">🗑️</button>
-                </div>
+          <transition-group name="list" tag="div" class="space-y-4" v-if="activeTab === 'projects'">
+            <div v-for="item in projects" :key="item.id" class="flex flex-col sm:flex-row gap-6 p-6 border border-brand-border bg-white group hover:border-brand-text transition-colors">
+              <div class="w-full sm:w-48 aspect-video bg-brand-surface shrink-0 relative border border-brand-border">
+                <img v-if="item.image_url" :src="item.image_url" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
+                <div v-else class="w-full h-full flex items-center justify-center text-brand-subtext font-mono text-[10px] uppercase">No Image</div>
               </div>
-              <div class="p-4">
-                <h3 class="font-bold text-white mb-1 truncate">{{ item.title }}</h3>
-                <p class="text-xs text-zinc-400 line-clamp-2">{{ item.description }}</p>
-                <div class="mt-3 flex flex-wrap gap-1">
-                   <span v-for="tag in item.tags" :key="tag" class="text-[10px] px-1.5 py-0.5 bg-zinc-800 rounded text-zinc-300 border border-zinc-700">{{ tag }}</span>
+              <div class="flex-grow flex flex-col">
+                <h3 class="font-serif text-xl font-bold text-brand-text mb-2">{{ item.title }}</h3>
+                <p class="text-sm text-brand-subtext line-clamp-2 mb-4">{{ item.description }}</p>
+                <div class="mt-auto flex justify-between items-center pt-4 border-t border-brand-surface">
+                   <div class="flex flex-wrap gap-2">
+                     <span v-for="tag in item.tags" :key="tag" class="font-mono text-[10px] bg-brand-surface border border-brand-border px-2 py-1 uppercase">{{ tag }}</span>
+                   </div>
+                   <button @click="deleteItem('projects', item.id)" class="text-xs font-bold uppercase tracking-widest text-brand-text hover:text-red-600 transition-colors">Delete</button>
                 </div>
               </div>
             </div>
           </transition-group>
 
-          <transition-group name="list" tag="div" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" v-if="activeTab === 'certificates'">
-            <div v-for="item in certificates" :key="item.id" class="glass-card p-4 flex gap-4 items-center group">
-              <img v-if="item.image_url" :src="item.image_url" class="w-16 h-16 rounded-lg object-cover bg-zinc-800 border border-zinc-700">
-              <div class="flex-grow min-w-0">
-                <h3 class="font-bold text-white text-sm truncate">{{ item.title }}</h3>
-                <p class="text-xs text-brand-primary">{{ item.issuer }}</p>
-                <a v-if="item.pdf_url" :href="item.pdf_url" target="_blank" class="text-[10px] text-zinc-500 hover:text-white underline mt-1 block">View PDF</a>
+          <transition-group name="list" tag="div" class="grid grid-cols-1 md:grid-cols-2 gap-4" v-if="activeTab === 'certificates'">
+            <div v-for="item in certificates" :key="item.id" class="p-6 border border-brand-border bg-white flex flex-col group hover:border-brand-text transition-colors">
+              <div class="aspect-video w-full bg-brand-surface border border-brand-border mb-4">
+                <img v-if="item.image_url" :src="item.image_url" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
               </div>
-              <button @click="deleteItem('certificates', item.id)" class="p-2 text-zinc-500 hover:text-red-500 transition-colors">🗑️</button>
+              <div class="font-mono text-[10px] text-brand-subtext uppercase tracking-widest mb-1">{{ item.issuer }}</div>
+              <h3 class="font-serif text-lg font-bold text-brand-text mb-4">{{ item.title }}</h3>
+              <div class="mt-auto flex justify-between items-center pt-4 border-t border-brand-surface">
+                <a v-if="item.pdf_url" :href="item.pdf_url" target="_blank" class="text-xs font-bold uppercase tracking-widest hover:text-brand-primary">View PDF</a>
+                <span v-else class="text-xs font-bold uppercase tracking-widest text-brand-subtext">No PDF</span>
+                <button @click="deleteItem('certificates', item.id)" class="text-xs font-bold uppercase tracking-widest text-brand-text hover:text-red-600 transition-colors">Delete</button>
+              </div>
             </div>
           </transition-group>
 
-          <transition-group name="list" tag="div" class="space-y-3" v-if="activeTab === 'publications'">
-            <div v-for="item in publications" :key="item.id" class="glass-card p-4 flex items-center justify-between group">
-              <div class="flex items-center gap-4">
-                <div class="w-10 h-10 rounded-full flex items-center justify-center bg-zinc-800 border border-zinc-700 text-brand-primary">
-                  {{ item.type === 'Buku' ? '📖' : '📄' }}
-                </div>
-                <div>
-                  <h3 class="font-bold text-white">{{ item.title }}</h3>
-                  <p class="text-xs text-zinc-400">{{ item.description }}</p>
-                </div>
+          <transition-group name="list" tag="div" class="space-y-2" v-if="activeTab === 'publications'">
+            <div v-for="item in publications" :key="item.id" class="p-4 border border-brand-border bg-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 group hover:border-brand-text transition-colors">
+              <div class="flex-grow">
+                <div class="font-mono text-[10px] text-brand-primary font-bold uppercase tracking-widest mb-1">{{ item.type }}</div>
+                <h3 class="font-serif text-base font-bold text-brand-text">{{ item.title }}</h3>
+                <p class="text-sm text-brand-subtext line-clamp-1 mt-1">{{ item.description }}</p>
               </div>
-              <button @click="deleteItem('publications', item.id)" class="p-2 text-zinc-500 hover:text-red-500 transition-colors">🗑️</button>
+              <div class="flex items-center gap-6 shrink-0">
+                <a v-if="item.link" :href="item.link" target="_blank" class="text-xs font-bold uppercase tracking-widest hover:text-brand-primary">Link</a>
+                <button @click="deleteItem('publications', item.id)" class="text-xs font-bold uppercase tracking-widest text-brand-text hover:text-red-600 transition-colors">Delete</button>
+              </div>
             </div>
           </transition-group>
 
-          <div v-if="!isLoading && ((activeTab === 'projects' && projects.length === 0) || (activeTab === 'certificates' && certificates.length === 0) || (activeTab === 'publications' && publications.length === 0))" class="py-20 text-center border-2 border-dashed border-zinc-800 rounded-3xl opacity-50">
-            <p class="text-zinc-500">Data masih kosong.</p>
+          <div v-if="!isLoading && ((activeTab === 'projects' && projects.length === 0) || (activeTab === 'certificates' && certificates.length === 0) || (activeTab === 'publications' && publications.length === 0))" class="py-16 text-center border border-brand-border bg-brand-surface">
+            <p class="font-mono text-sm tracking-widest text-brand-subtext uppercase">No Records Found.</p>
           </div>
 
         </div>
@@ -318,26 +309,11 @@ onMounted(() => {
 </template>
 
 <style scoped>
-/* Utility Classes for Glassmorphism */
-.glass-input {
-  @apply w-full bg-black/40 border border-zinc-700 rounded-lg p-3 text-sm text-white focus:border-brand-primary focus:bg-black/60 outline-none transition-all placeholder:text-zinc-600;
-}
-.glass-file {
-  @apply w-full text-xs text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-zinc-800 file:text-brand-primary hover:file:bg-brand-primary hover:file:text-white cursor-pointer;
-}
-.glass-btn {
-  /* Ganti 'hover:bg-brand-primary-light' jadi 'hover:brightness-110' */
-  @apply w-full bg-brand-primary hover:brightness-110 text-white font-bold py-3 px-4 rounded-xl transition-all duration-300 shadow-lg shadow-brand-primary/20 disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-95;
-}
-.glass-card {
-  @apply bg-zinc-900/40 border border-zinc-800/50 rounded-2xl overflow-hidden hover:border-brand-primary/30 transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+.editorial-input {
+  @apply w-full bg-brand-bg border border-brand-border p-3 text-sm text-brand-text focus:border-brand-primary outline-none transition-colors placeholder:text-brand-subtext;
 }
 
-/* Animations */
-.fade-enter-active, .fade-leave-active { transition: opacity 0.5s ease; }
-.fade-enter-from, .fade-leave-to { opacity: 0; }
-
-.list-enter-active, .list-leave-active { transition: all 0.4s ease; }
-.list-enter-from, .list-leave-to { opacity: 0; transform: translateY(20px); }
-.list-move { transition: transform 0.4s ease; }
+.list-enter-active, .list-leave-active { transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+.list-enter-from, .list-leave-to { opacity: 0; transform: translateY(10px); }
+.list-move { transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
 </style>

@@ -1,11 +1,11 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue';
 
 const navLinks = [
-  { href: '#home', label: 'Home' },
-  { href: '#proyek', label: 'Proyek' },
-  { href: '#tulisan', label: 'Publikasi' },
-  { href: '#sertifikat', label: 'Sertifikasi' }
+  { href: '#home', label: 'Index' },
+  { href: '#proyek', label: 'Projects' },
+  { href: '#tulisan', label: 'Writings' },
+  { href: '#sertifikat', label: 'Certifications' }
 ];
 
 const activeSection = ref('home');
@@ -40,7 +40,7 @@ const handleKeydown = (e: KeyboardEvent) => {
   
   if (e.key === 'Tab' && isMobileMenuOpen.value && mobileMenuRef.value) {
     const focusableElements = mobileMenuRef.value.querySelectorAll(
-      'a[href], button, textarea, input[type="text"], input[type="radio"], input[type="checkbox"], select'
+      'a[href], button'
     );
     const firstElement = focusableElements[0] as HTMLElement;
     const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
@@ -100,7 +100,7 @@ watch(isMobileMenuOpen, (open) => {
 
 onMounted(() => {
   prefersReducedMotion.value = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  window.addEventListener('scroll', handleScroll);
+  window.addEventListener('scroll', handleScroll, { passive: true });
   document.addEventListener('keydown', handleKeydown);
   initSectionObserver();
 });
@@ -117,37 +117,45 @@ onUnmounted(() => {
 <template>
   <header 
     :class="[
-      'fixed top-0 left-0 right-0 z-50 w-full transition-colors duration-0 ease-in-out',
+      'fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 ease-editorial border-b border-transparent',
       isScrolled 
-        ? 'bg-brand-bg border-b border-brand-surface py-4' 
-        : 'bg-transparent py-6'
+        ? 'bg-brand-bg/95 backdrop-blur-sm border-brand-border py-4' 
+        : 'bg-transparent py-8'
     ]"
   >
-    <div class="container mx-auto px-6 md:px-8">
+    <div class="max-w-7xl mx-auto px-6 md:px-12">
       <nav class="flex justify-between items-center">
         
-        <a href="#home" @click="goHome" class="font-serif font-bold text-xl text-brand-text tracking-tighter" aria-label="Back to top">
-          M.RIFKY
+        <a href="#home" @click="goHome" class="font-serif font-bold text-2xl text-brand-text tracking-tight flex items-center gap-2 group focus-visible:outline-2 focus-visible:outline-brand-focus" aria-label="Back to top">
+          <span class="w-3 h-3 bg-brand-primary block group-hover:scale-125 transition-transform duration-300 ease-editorial"></span>
+          Rifky.
         </a>
 
         <!-- Desktop Menu -->
-        <div class="hidden md:flex items-center gap-10 text-brand-text font-medium text-sm tracking-wide">
+        <div class="hidden md:flex items-center gap-8 font-mono text-sm uppercase tracking-widest">
           <a 
             v-for="link in navLinks" 
             :key="link.href"
             :href="link.href" 
-            class="pb-1 transition-none border-b-2"
-            :class="activeSection === link.href.slice(1) ? 'border-brand-text text-brand-text' : 'border-transparent text-brand-subtext hover:border-brand-subtext'"
+            class="relative py-1 transition-colors duration-200"
+            :class="activeSection === link.href.slice(1) ? 'text-brand-text font-bold' : 'text-brand-subtext hover:text-brand-primary'"
           >
             {{ link.label }}
+            <span 
+              v-if="activeSection === link.href.slice(1)"
+              class="absolute bottom-0 left-0 w-full h-[2px] bg-brand-primary transform origin-left transition-transform duration-300"
+            ></span>
           </a>
+
+          <div class="w-px h-4 bg-brand-border mx-2"></div>
 
           <a 
             href="https://github.com/KYCE26" 
             target="_blank" 
-            class="border border-brand-text text-brand-text font-bold py-2 px-6 rounded-none hover:bg-brand-text hover:text-brand-bg transition-colors duration-0 uppercase text-xs tracking-widest"
+            class="text-brand-text hover:text-brand-primary font-bold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-brand-focus flex items-center gap-2"
           >
-            GITHUB
+            Github
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
           </a>
         </div>
 
@@ -155,7 +163,7 @@ onUnmounted(() => {
         <button 
           ref="toggleBtnRef"
           @click="toggleMobileMenu" 
-          class="md:hidden text-brand-text font-mono text-sm tracking-widest uppercase p-2 z-[60] relative focus-visible:outline-2 focus-visible:outline-brand-focus"
+          class="md:hidden text-brand-text font-mono text-sm tracking-widest uppercase z-[60] relative focus-visible:outline-2 focus-visible:outline-brand-focus p-2 -mr-2"
           :aria-expanded="isMobileMenuOpen"
           aria-controls="mobile-menu"
           aria-label="Toggle Menu"
@@ -166,33 +174,49 @@ onUnmounted(() => {
     </div>
 
     <!-- Mobile Overlay -->
-    <div 
-      v-if="isMobileMenuOpen"
-      id="mobile-menu"
-      ref="mobileMenuRef"
-      class="md:hidden fixed inset-0 z-[55] bg-brand-bg flex flex-col justify-center px-8 pb-12"
-      role="dialog"
-      aria-modal="true"
-      aria-label="Main Navigation"
-    >
-      <div class="flex flex-col gap-8">
-        <a 
-          v-for="link in navLinks" 
-          :key="link.href"
-          :href="link.href" 
-          @click="closeMobileMenu"
-          class="font-serif text-4xl md:text-5xl font-bold text-brand-text p-2 hover:bg-brand-text hover:text-brand-bg transition-colors duration-0 w-fit focus-visible:outline-2 focus-visible:outline-brand-focus"
-        >
-          {{ link.label }}
-        </a>
-        <a 
-          href="https://github.com/KYCE26" 
-          target="_blank"
-          class="font-serif text-4xl md:text-5xl font-bold text-brand-text p-2 mt-4 hover:bg-brand-text hover:text-brand-bg transition-colors duration-0 w-fit border-t-4 border-brand-text focus-visible:outline-2 focus-visible:outline-brand-focus"
-        >
-          GITHUB
-        </a>
+    <Transition name="menu-fade">
+      <div 
+        v-if="isMobileMenuOpen"
+        id="mobile-menu"
+        ref="mobileMenuRef"
+        class="md:hidden fixed inset-0 z-[55] bg-brand-bg flex flex-col justify-center px-8"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Main Navigation"
+      >
+        <div class="flex flex-col gap-6">
+          <a 
+            v-for="(link, i) in navLinks" 
+            :key="link.href"
+            :href="link.href" 
+            @click="closeMobileMenu"
+            class="font-serif text-5xl font-bold text-brand-text hover:text-brand-primary transition-colors duration-200 w-fit focus-visible:outline-2 focus-visible:outline-brand-focus leading-tight"
+            :style="`animation-delay: ${i * 50}ms`"
+          >
+            {{ link.label }}
+          </a>
+          <div class="w-12 h-1 bg-brand-border my-4"></div>
+          <a 
+            href="https://github.com/KYCE26" 
+            target="_blank"
+            class="font-mono text-sm uppercase tracking-widest text-brand-subtext hover:text-brand-primary transition-colors duration-200 w-fit focus-visible:outline-2 focus-visible:outline-brand-focus flex items-center gap-2"
+          >
+            GITHUB <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+          </a>
+        </div>
       </div>
-    </div>
+    </Transition>
   </header>
 </template>
+
+<style scoped>
+.menu-fade-enter-active,
+.menu-fade-leave-active {
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.menu-fade-enter-from,
+.menu-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+</style>
