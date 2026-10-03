@@ -147,21 +147,13 @@ onUnmounted(() => {
 <template>
   <div class="bg-brand-bg text-brand-text min-h-screen relative font-sans selection:bg-brand-surface selection:text-brand-primary">
 
-    <!-- PROGRESS BAR SCROLL -->
-    <div class="fixed top-0 left-0 right-0 z-[90] h-[2px] bg-transparent pointer-events-none">
-      <div
-        class="h-full bg-brand-primary transition-[width] duration-150 ease-out"
-        :style="{ width: scrollProgress + '%' }"
-      ></div>
-    </div>
-
     <!-- Noise filter removed -->
 
     <!-- PRELOADER SCREEN -->
     <Transition name="fade">
       <div v-if="isLoading" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-brand-bg">
-        <span class="text-2xl font-serif font-bold text-brand-text">
-          M
+        <span class="text-xl font-heading font-bold text-brand-text tracking-widest uppercase">
+          Loading
         </span>
         <div class="mt-4 w-48 h-[1px] bg-brand-surface overflow-hidden">
           <div
@@ -170,7 +162,7 @@ onUnmounted(() => {
           ></div>
         </div>
         <p class="mt-4 text-brand-subtext text-xs font-mono">
-          INITIALIZING {{ Math.floor(loadProgress) }}%
+          INIT {{ Math.floor(loadProgress) }}%
         </p>
       </div>
     </Transition>
