@@ -9,6 +9,17 @@ function formatYear(dateStr: string) {
   if (!dateStr) return '';
   return new Date(dateStr).getFullYear();
 }
+
+function getActionText(type: string) {
+  if (!type) return 'BUKA TAUTAN';
+  const t = type.toLowerCase();
+  if (t.includes('buku')) return 'LIHAT BUKU';
+  if (t.includes('artikel')) return 'BACA ARTIKEL';
+  if (t.includes('jurnal')) return 'BACA JURNAL';
+  if (t.includes('video')) return 'TONTON VIDEO';
+  if (t.includes('modul')) return 'LIHAT MODUL';
+  return 'BUKA TAUTAN';
+}
 </script>
 
 <template>
@@ -20,7 +31,7 @@ function formatYear(dateStr: string) {
           Publications
         </h2>
         <p class="font-mono text-sm tracking-widest text-brand-subtext uppercase">
-          Tulisan & Artikel
+          Tulisan & Karya
         </p>
       </div>
 
@@ -46,9 +57,10 @@ function formatYear(dateStr: string) {
             v-if="pub.link" 
             :href="pub.link" 
             target="_blank" 
-            class="text-xs font-bold text-brand-text uppercase tracking-widest hover:text-brand-primary transition-colors focus-visible:outline-2 focus-visible:outline-brand-focus ml-0 md:ml-4 whitespace-nowrap"
+            class="text-xs font-bold text-brand-text uppercase tracking-widest hover:text-brand-primary transition-colors focus-visible:outline-2 focus-visible:outline-brand-focus ml-0 md:ml-4 whitespace-nowrap flex items-center gap-1"
           >
-            BACA ARTIKEL
+            {{ getActionText(pub.type) }}
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
           </a>
         </div>
       </div>
